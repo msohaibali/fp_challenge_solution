@@ -33,6 +33,7 @@ This repository contains solution of GitHub [fp_challenge](https://github.com/k-
 
 - Adding New Features Columns in base csv and saving in output folder
 - [FASTAPI](https://fastapi.tiangolo.com/) to make API Service of Application
+- Multi-Processing (To Run the Feature Generation Function in Parallel)
 - Dockerized Solution
 
 ## Pre-requisites to run the solution
