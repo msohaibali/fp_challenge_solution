@@ -7,19 +7,13 @@ if not sys.warnoptions:
     warnings.simplefilter("ignore")
 
 
-# operations_dict = {
-#     "Average": [200, 300],
-#     "Standard_deviation": [100, 300],
-#     "Exponential_average": [500, 700],
-# }
-
-
 class FeaturesReader:
     def __init__(self, target_path: str) -> pd.DataFrame:
         """
         Get the Target Path (Local File or URL) and load that in DataFrame
         :param target_path: Path of the csv file
         """
+
         self.data = pd.read_csv(target_path)
 
 
@@ -33,6 +27,14 @@ class MultiFeaturesGenerator:
         rolling_window_size: int,
         operation_type: str,
     ):
+        """
+        Get the Main DataFrame and Generate the Sub-DataFrame with
+        required operation applied
+        :param incoming_df: main dataframe for applying the operation
+        :param rolling_window_size: size of Rolling Window
+        :param operation_type: type of operation to perform
+        """
+
         if operation_type == "Average":
             sub_df = incoming_df.rolling(rolling_window_size).mean()
 

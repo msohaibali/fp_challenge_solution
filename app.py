@@ -16,6 +16,9 @@ app = FastAPI()
 
 @app.get("/")
 async def root():
+    """
+    Landing/Index Page of API Server
+    """
     return {"api": "Version 1.0"}
 
 
@@ -24,6 +27,14 @@ def features_generator(
     operations_dict: OperationsDictionary,
     features_path: str,
 ):
+    """
+    Route to grab the input and operation dict,
+    Performs the Operations in Parallel,
+
+    :param operations_dict: Dictionary with Operations List
+    :param features_path: Path of the csv file
+    :return dict: Processing Time and Updated COl_NAMES
+    """
 
     # DATA READING BLOCK
     start_time = datetime.now()
@@ -35,11 +46,11 @@ def features_generator(
     start_ptime = datetime.now()
     features_generator_obj = MultiFeaturesGenerator()
 
-    all_threads = []
+    processes_list = list()
     for key, value in operations_dict.items():
         for single_window in value:
 
-            th = Process(
+            single_process = Process(
                 target=MultiFeaturesGenerator.RollingOperations,
                 args=(
                     data_obj.data,
@@ -48,8 +59,8 @@ def features_generator(
                 ),
             )
 
-            th.start()
-            all_threads.append(th)
+            single_process.start()
+            processes_list.append(single_process)
 
             features_generator_obj.RollingOperations(
                 incoming_df=data_obj.data,
@@ -57,11 +68,16 @@ def features_generator(
                 operation_type=key,
             )
 
-    for process in all_threads:
-        process.join()
+    # Wait For Running Processes to Finish
+    for running_process in processes_list:
+        running_process.join()
 
+    # Add the New Feature Columns into main DataFrame
     final_df = pd.concat([data_obj.data, features_generator_obj.df], axis=1)
+
+    # Export CSV File from DataFrame
     final_df.to_csv(config.get("export_csv_path"), index=False)
+
     end_ptime = datetime.now()
 
     return ResponseModel(
